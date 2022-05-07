@@ -118,7 +118,7 @@ mesh::mesh() = delete;
 mesh::mesh(const char *filename)
 {
     bounding_box B;
-    if (!load_OFF_file(filename, indexed_vertices, indexed_normals, indices, triangles, B.xmin, B.xmax, B.ymin, B.ymax, B.zmin, B.zmax))
+    if (!load_OFF_file(filename, vertices, normals, indices, triangles, B.xmin, B.xmax, B.ymin, B.ymax, B.zmin, B.zmax))
     {
         std::cerr << "Failure to load " << filename << " file" << std::endl;
     }
@@ -132,20 +132,92 @@ mesh::mesh(const char *filename)
 void mesh::simplify(uint32_t resolution)
 {
     // 3-dimension resolution in space.
-    std::vector<glm::vec3> vpixel;
-    std::vector<glm::vec3> vpixel_index;
+    std::vector<std::vector<uint16_t>> vpixel;
+    std::vector<std::vector<uint16_t>> vpixel_index_new;
     vpixel.resize(resolution * resolution * resolution);
-    vpixel_index.resize(resolution * resolution * resolution);
-
+    vpixel_index_new.resize(resolution * resolution * resolution);
+    // enlarge the bounding box to make sure all the vertices are inside the box.
     bounding_box BoxProcess = box;
-    BoxProcess.enlarge(0.2);
+    BoxProcess.enlarge(0.1);
+    // calculate dx, dy, dz for each volume pixel.
+    float dx = (BoxProcess.xmax - BoxProcess.xmin) / resolution;
+    float dy = (BoxProcess.ymax - BoxProcess.ymin) / resolution;
+    float dz = (BoxProcess.zmax - BoxProcess.zmin) / resolution;
+    // for each node of each triangle, calculate the volume pixel it belongs to.
+    // std::vector<std::vector<uint16_t>> triangles;
+    for (size_t t = 0; t < triangles.size(); ++t)
+    {
+        for (size_t v = 0; v < 3; ++v)
+        {
+            uint16_t vtmp = triangles[t][v];
+            int x = (int)((vertices[vtmp].x - BoxProcess.xmin) / dx);
+            int y = (int)((vertices[vtmp].y - BoxProcess.ymin) / dy);
+            int z = (int)((vertices[vtmp].z - BoxProcess.zmin) / dz);
+            if (count(vpixel[x * resolution * resolution + y * resolution + z].begin(), vpixel[x * resolution * resolution + y * resolution + z].end(), vtmp) == 0)
+            {
+                vpixel[x * resolution * resolution + y * resolution + z].push_back(vtmp);
+            }
+        }
+    }
+
+    // for each volume pixel, calculate the average of the vertices and the normal.
+    std::vector<glm::vec3> vavg;
+    std::vector<glm::vec3> vnorm;
+    uint32_t ind_new = 0;
+    for (size_t v = 0; v < vpixel.size(); ++v)
+    {
+        if (vpixel[v].size() > 0)
+        {
+            glm::vec3 tmp;
+            glm::vec3 tmp_norm;
+            for (auto vtmp : vpixel[v])
+            {
+                tmp += vertices[vtmp];
+                tmp_norm += normals[vtmp];
+            }
+            tmp = tmp / vpixel[v].size();
+            tmp_norm = tmp_norm / vpixel[v].size();
+            vavg.push_back(tmp);
+            vnorm.push_back(tmp_norm);
+            vpixel_index_new[v] = ind_new;
+            ind_new++;
+        }
+        else
+        {
+            vpixel_index_new[v] = -1;
+        }
+    }
+    // for each vertex in each triangle, calculate the new index.
+    std::vector<std::vector<uint16_t>> triangles_new;
+    for (size_t t = 0; t < triangles.size(); ++t)
+    {
+        std::vector<uint16_t> v_new;
+        for (size_t v = 0; v < 3; ++v)
+        {
+            uint16_t vtmp = triangles[t][v];
+            int x = (int)((vertices[vtmp].x - BoxProcess.xmin) / dx);
+            int y = (int)((vertices[vtmp].y - BoxProcess.ymin) / dy);
+            int z = (int)((vertices[vtmp].z - BoxProcess.zmin) / dz);
+            v_new.push_back(vpixel_index_new[x * resolution * resolution + y * resolution + z]);
+        }
+        if (v_new[0] != -1 && v_new[1] != -1 && v_new[2] != -1 && v_new[0] != v_new[1] && v_new[1] != v_new[2] && v_new[0] != v_new[2])
+        {
+            triangles_new.push_back(v_new);
+        }
+    }
+    triangles = triangles_new;
+    vertices = vavg;
+    normals = vnorm;
 }
 void mesh::compute_normals_vertex()
 {
+    return;
 }
 uint32_t mesh::get_vertex_count()
 {
+    return vertices.size();
 }
 uint32_t mesh::get_triangle_count()
 {
+    return triangles.size();
 }

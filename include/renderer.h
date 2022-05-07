@@ -17,9 +17,6 @@
 #include <GLFW/glfw3.h>
 
 // Include GLM
-#include <glm.hpp>
-#include <gtc/matrix_transform.hpp>
-#include <gtx/transform.hpp>
 
 #include "shader.h"
 #include "mesh.h"
@@ -32,7 +29,7 @@ public:
     void render(float camera_pos, float light_pos, bool is_light);
     void update();
     void clear();
-    mesh orig;
+    mesh model;
 
 private:
     uint32_t VertexArrayID;
