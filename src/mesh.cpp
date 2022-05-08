@@ -1,4 +1,29 @@
 #include "mesh.h"
+
+// class mesh
+// {
+// private:
+//     bool load_OFF_file(const std::string &filename, std::vector<glm::vec3> &vertices,
+//                        std::vector<glm::vec3> &normals, std::vector<unsigned short> &indices,
+//                        std::vector<std::vector<unsigned short>> &triangles, double &xmin, double &xmax,
+//                        double &ymin, double &ymax, double &zmin, double &zmax);
+
+// public:
+//     // functions
+//     mesh();
+//     mesh(const char *filename);
+//     void simplify(uint32_t resolution);
+//     void compute_normals_vertex();
+//     uint32_t get_vertex_count();
+//     uint32_t get_triangle_count();
+//     uint32_t get_element_count();
+//     // data
+//     std::vector<unsigned short> indices;
+//     std::vector<glm::vec3> vertices, normals;
+//     std::vector<std::vector<uint16_t>> triangles; // opengl draw mode
+//     bounding_box box;
+// };
+
 bool mesh::load_OFF_file(const std::string &filename, std::vector<glm::vec3> &vertices,
                          std::vector<glm::vec3> &normals, std::vector<uint16_t> &indices,
                          std::vector<std::vector<uint16_t>> &triangles, double &xmin, double &xmax,
@@ -133,7 +158,7 @@ void mesh::simplify(uint32_t resolution)
 {
     // 3-dimension resolution in space.
     std::vector<std::vector<uint16_t>> vpixel;
-    std::vector<std::vector<uint16_t>> vpixel_index_new;
+    std::vector<uint16_t> vpixel_index_new;
     vpixel.resize(resolution * resolution * resolution);
     vpixel_index_new.resize(resolution * resolution * resolution);
     // enlarge the bounding box to make sure all the vertices are inside the box.
@@ -175,8 +200,8 @@ void mesh::simplify(uint32_t resolution)
                 tmp += vertices[vtmp];
                 tmp_norm += normals[vtmp];
             }
-            tmp = tmp / vpixel[v].size();
-            tmp_norm = tmp_norm / vpixel[v].size();
+            tmp = tmp / (float)vpixel[v].size();
+            tmp_norm = tmp_norm / (float)vpixel[v].size();
             vavg.push_back(tmp);
             vnorm.push_back(tmp_norm);
             vpixel_index_new[v] = ind_new;

@@ -26,7 +26,7 @@ class renderer
 public:
     renderer(uint32_t shader_id, mesh &m);
     ~renderer();
-    void render(float camera_pos, float light_pos, bool is_light);
+    void render(float camera_angle, float light_angle, bool is_light);
     void update();
     void clear();
     mesh model;
@@ -34,7 +34,7 @@ public:
 private:
     uint32_t VertexArrayID;
     uint32_t programID;
-    uint32_t MatrixID, ViewMatrixID, ModelMatrixID;
+    uint32_t MatrixID, ViewMatrixID, ModelMatrixID, ProjMatrixID, CameraID;
     uint32_t LightID;
     uint32_t vertexbuffer;
     uint32_t normalbuffer;

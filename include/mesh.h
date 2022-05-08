@@ -93,6 +93,7 @@ public:
     void compute_normals_vertex();
     uint32_t get_vertex_count();
     uint32_t get_triangle_count();
+    uint32_t get_element_count();
     // data
     std::vector<unsigned short> indices;
     std::vector<glm::vec3> vertices, normals;
