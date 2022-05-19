@@ -34,8 +34,8 @@ public:
 private:
     uint32_t VertexArrayID;
     uint32_t programID;
-    uint32_t MatrixID, ViewMatrixID, ModelMatrixID, ProjMatrixID, CameraID;
-    uint32_t LightID;
+    uint32_t MatrixID, ViewMatrixID, ModelMatrixID, ProjMatrixID, CameraID, LightID;
+    uint32_t LightColorID, ObjColorID;
     uint32_t vertexbuffer;
     uint32_t normalbuffer;
     uint32_t elementbuffer;

@@ -33,6 +33,8 @@ Renderer::Renderer(uint32_t shader_id, Mesh &m)
     ModelMatrixID = glGetUniformLocation(programID, "M");
     LightID = glGetUniformLocation(programID, "lightPos");
     CameraID = glGetUniformLocation(programID, "viewPos");
+    LightColorID = glGetUniformLocation(programID, "lightColor");
+    ObjColorID = glGetUniformLocation(programID, "objectColor");
 
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -50,6 +52,7 @@ Renderer::Renderer(uint32_t shader_id, Mesh &m)
 }
 extern int SCR_WIDTH;
 extern int SCR_HEIGHT;
+Renderer::~Renderer() = default;
 void Renderer::render(float camera_angle, float light_angle, bool is_light)
 {
     glm::mat4 ProjectionMatrix = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
@@ -71,7 +74,7 @@ void Renderer::render(float camera_angle, float light_angle, bool is_light)
     ModelMatrix = glm::translate(ModelMatrix, -model.box.get_center());
     ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.0 / (double)model.box.get_size().x));
     ModelMatrix = glm::rotate(ModelMatrix, glm::radians(camera_angle), glm::vec3(0.0f, 0.1f, 0.0f));
-    glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+    // glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
     glm::vec3 lightPos = glm::vec3(3.2 * std::cos(light_angle), 2.2, 3.2 * std::sin(light_angle));
     glm::vec3 viewPos = glm::vec3(2, 1, 3);
     // Send our transformation to the currently bound shader,
@@ -120,6 +123,22 @@ void Renderer::render(float camera_angle, float light_angle, bool is_light)
     );
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
+    // uniform vec3 lightPos;
+    // uniform vec3 viewPos;
+    // uniform vec3 lightColor;
+    // uniform vec3 objectColor;
+    glm::vec3 lightColor;
+    if (is_light)
+    {
+        lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+    }
+    else
+    {
+        lightColor = glm::vec3(0.0f, 0.0f, 0.0f);
+    }
+    glm::vec3 objectColor = glm::vec3(1.0f, 0.5f, 0.31f);
+    glUniform3fv(LightColorID, 1, &lightColor[0]);
+    glUniform3fv(ObjColorID, 1, &objectColor[0]);
 }
 void Renderer::update()
 {

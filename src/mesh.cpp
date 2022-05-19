@@ -138,7 +138,7 @@ bool Mesh::load_OFF_file(const std::string &filename, std::vector<glm::vec3> &ve
     myfile.close();
     return true;
 }
-Mesh::Mesh() = delete;
+Mesh::Mesh() = default;
 
 Mesh::Mesh(const char *filename)
 {
@@ -207,10 +207,10 @@ void Mesh::simplify(uint32_t resolution)
             vpixel_index_new[v] = ind_new;
             ind_new++;
         }
-        else
-        {
-            vpixel_index_new[v] = -1;
-        }
+        // else
+        // {
+        //     vpixel_index_new[v] = -1;
+        // }
     }
     // for each vertex in each triangle, calculate the new index.
     std::vector<std::vector<uint16_t>> triangles_new;
@@ -225,7 +225,8 @@ void Mesh::simplify(uint32_t resolution)
             int z = (int)((vertices[vtmp].z - BoxProcess.zmin) / dz);
             v_new.push_back(vpixel_index_new[x * resolution * resolution + y * resolution + z]);
         }
-        if (v_new[0] != -1 && v_new[1] != -1 && v_new[2] != -1 && v_new[0] != v_new[1] && v_new[1] != v_new[2] && v_new[0] != v_new[2])
+        // if (v_new[0] != -1 && v_new[1] != -1 && v_new[2] != -1 && )
+        if (v_new[0] != v_new[1] && v_new[1] != v_new[2] && v_new[0] != v_new[2])
         {
             triangles_new.push_back(v_new);
         }
@@ -245,4 +246,8 @@ uint32_t Mesh::get_vertex_count()
 uint32_t Mesh::get_triangle_count()
 {
     return triangles.size();
+}
+uint32_t Mesh::get_element_count()
+{
+    return indices.size();
 }

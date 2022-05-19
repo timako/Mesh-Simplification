@@ -11,6 +11,9 @@
 #include "mesh.h"
 #include "renderer.h"
 
+#include <thread>
+#include <chrono>
+
 int SCR_WIDTH = 1920;
 int SCR_HEIGHT = 1080;
 
@@ -36,6 +39,41 @@ void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+}
+std::string getCurrentWorkingDirectory()
+{
+    char cCurrentPath[FILENAME_MAX];
+
+    if (!getcwd(cCurrentPath, sizeof(cCurrentPath)))
+    {
+        return std::string();
+    }
+
+    cCurrentPath[sizeof(cCurrentPath) - 1] = '\0';
+    std::string currentPath = std::string(cCurrentPath);
+    int found = currentPath.find("build");
+    currentPath = currentPath.substr(0, found);
+    unsigned int i = 0;
+    while (i < currentPath.size())
+    {
+        if (currentPath[i] == '\\')
+        {
+            currentPath[i] = '/';
+        }
+        ++i;
+    }
+    return currentPath;
+}
+void little_sleep(std::chrono::milliseconds us)
+{
+    auto start = std::chrono::high_resolution_clock::now();
+    auto end = start + us;
+    do
+    {
+        std::this_thread::yield();
+        // if (!awake) std::cout << "sleep" << std::endl;
+        // else {std::cout << "-------- AWAKE" << std::endl; break;}
+    } while (std::chrono::high_resolution_clock::now() < end);
 }
 int main()
 {
@@ -75,14 +113,14 @@ int main()
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
     glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
     // get current working directory
-    char cwd[1024];
-    getcwd(cwd, sizeof(cwd));
-    std::string path = std::string(cwd) + "/model/" + loadedFileName + ".obj";
+    std::string currentPath = getCurrentWorkingDirectory();
+    std::string path = std::string(currentPath) + "models/" + loadedFileName + ".off";
     // load mesh
     Mesh origmodel(path.c_str());
     Mesh processModel = origmodel;
     // compile shader
-    Shader shader((std::string(cwd) + "/shader/VertexShader.glsl").c_str(), (std::string(cwd) + "/shader/FragmentShader.glsl").c_str());
+    Shader shader((std::string(currentPath) + "shader/VertexShader.glsl").c_str(), (std::string(currentPath) + "shader/FragmentShader.glsl").c_str());
+
     // create renderer
     Renderer renderer(shader.ID, processModel);
     // create ImGui
@@ -100,7 +138,7 @@ int main()
         if (loadedFileName != saveFileName)
         {
             saveFileName = loadedFileName;
-            path = std::string(cwd) + "/model/" + loadedFileName + ".obj";
+            path = std::string(currentPath) + "model/" + loadedFileName + ".off";
             origmodel = Mesh(path.c_str());
             processModel = origmodel;
             vpixelResolution = 100;
@@ -116,9 +154,8 @@ int main()
             renderer.update();
         }
         // SwapBuffer
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-        // init render set
+
+                // init render set
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
@@ -127,6 +164,7 @@ int main()
         else
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         // render model
+        shader.use();
         renderer.render(camRotate, lightRotate, islight);
         numVertices = processModel.get_vertex_count();
         numFaces = processModel.get_triangle_count();
@@ -137,6 +175,9 @@ int main()
         drawGui();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+        little_sleep(std::chrono::milliseconds(25));
     }
 }
 void drawGui()
@@ -146,7 +187,6 @@ void drawGui()
         ImGui::SetWindowPos(ImVec2(0, 0), ImGuiCond_Once);
         ImGui::SetWindowSize(ImVec2(400, (float)SCR_HEIGHT));
         ImGui::Dummy(ImVec2(0.0f, 20.0f));
-
         ImGui::Text(("Number of vertices : " + std::to_string(numVertices)).c_str());
         ImGui::Dummy(ImVec2(0.0f, 20.0f));
         ImGui::Text(("Number of faces : " + std::to_string(numFaces)).c_str());

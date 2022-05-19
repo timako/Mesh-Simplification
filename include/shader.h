@@ -82,6 +82,7 @@ public:
         // delete the shaders as they're linked into our program now and no longer necessary
         glDeleteShader(vertex);
         glDeleteShader(fragment);
+        std::cout << glGetShaderInfoLog;
     }
     // activate the shader
     // ------------------------------------------------------------------------

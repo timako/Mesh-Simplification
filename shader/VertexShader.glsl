@@ -14,5 +14,5 @@ void main()
     FragPos=vec3(M*vec4(aPos,1.));
     Normal=mat3(transpose(inverse(M)))*aNormal;
     
-    gl_Position=projection*view*vec4(FragPos,1.);
+    gl_Position=P*V*vec4(FragPos,1.);
 }
