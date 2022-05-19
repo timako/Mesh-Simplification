@@ -21,15 +21,15 @@
 #include "shader.h"
 #include "mesh.h"
 
-class renderer
+class Renderer
 {
 public:
-    renderer(uint32_t shader_id, mesh &m);
-    ~renderer();
+    Renderer(uint32_t shader_id, Mesh &m);
+    ~Renderer();
     void render(float camera_angle, float light_angle, bool is_light);
     void update();
     void clear();
-    mesh model;
+    Mesh model;
 
 private:
     uint32_t VertexArrayID;

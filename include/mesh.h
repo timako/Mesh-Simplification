@@ -44,7 +44,7 @@ public:
     }
 };
 
-class mesh
+class Mesh
 {
 private:
     /*
@@ -87,8 +87,8 @@ private:
 
 public:
     // functions
-    mesh();
-    mesh(const char *filename);
+    Mesh();
+    Mesh(const char *filename);
     void simplify(uint32_t resolution);
     void compute_normals_vertex();
     uint32_t get_vertex_count();

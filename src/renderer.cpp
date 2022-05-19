@@ -1,14 +1,14 @@
 #include "renderer.h"
 
-// class renderer
+// class Renderer
 // {
 // public:
-//     renderer(uint32_t shader_id, mesh &m);
-//     ~renderer();
+//     Renderer(uint32_t shader_id, Mesh &m);
+//     ~Renderer();
 //     void render(float camera_pos, float light_pos, bool is_light);
 //     void update();
 //     void clear();
-//     mesh orig;
+//     Mesh orig;
 
 // private:
 //     uint32_t VertexArrayID;
@@ -19,7 +19,7 @@
 //     uint32_t normalbuffer;
 //     uint32_t elementbuffer;
 // };
-renderer::renderer(uint32_t shader_id, mesh &m)
+Renderer::Renderer(uint32_t shader_id, Mesh &m)
 {
     programID = shader_id;
     model = m;
@@ -50,7 +50,7 @@ renderer::renderer(uint32_t shader_id, mesh &m)
 }
 extern int SCR_WIDTH;
 extern int SCR_HEIGHT;
-void renderer::render(float camera_angle, float light_angle, bool is_light)
+void Renderer::render(float camera_angle, float light_angle, bool is_light)
 {
     glm::mat4 ProjectionMatrix = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
@@ -121,7 +121,7 @@ void renderer::render(float camera_angle, float light_angle, bool is_light)
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
 }
-void renderer::update()
+void Renderer::update()
 {
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, model.get_vertex_count() * sizeof(glm::vec3), &model.vertices[0], GL_STATIC_DRAW);
@@ -130,7 +130,7 @@ void renderer::update()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, model.get_element_count() * sizeof(uint32_t), &model.indices[0], GL_STATIC_DRAW);
 }
-void renderer::clear()
+void Renderer::clear()
 {
     glDeleteBuffers(1, &vertexbuffer);
     glDeleteBuffers(1, &normalbuffer);

@@ -24,7 +24,7 @@
 //     bounding_box box;
 // };
 
-bool mesh::load_OFF_file(const std::string &filename, std::vector<glm::vec3> &vertices,
+bool Mesh::load_OFF_file(const std::string &filename, std::vector<glm::vec3> &vertices,
                          std::vector<glm::vec3> &normals, std::vector<uint16_t> &indices,
                          std::vector<std::vector<uint16_t>> &triangles, double &xmin, double &xmax,
                          double &ymin, double &ymax, double &zmin, double &zmax)
@@ -138,9 +138,9 @@ bool mesh::load_OFF_file(const std::string &filename, std::vector<glm::vec3> &ve
     myfile.close();
     return true;
 }
-mesh::mesh() = delete;
+Mesh::Mesh() = delete;
 
-mesh::mesh(const char *filename)
+Mesh::Mesh(const char *filename)
 {
     bounding_box B;
     if (!load_OFF_file(filename, vertices, normals, indices, triangles, B.xmin, B.xmax, B.ymin, B.ymax, B.zmin, B.zmax))
@@ -154,7 +154,7 @@ mesh::mesh(const char *filename)
         printf("view size: %f %f %f\n", B.get_size().x, B.get_size().y, B.get_size().z);
     }
 }
-void mesh::simplify(uint32_t resolution)
+void Mesh::simplify(uint32_t resolution)
 {
     // 3-dimension resolution in space.
     std::vector<std::vector<uint16_t>> vpixel;
@@ -234,15 +234,15 @@ void mesh::simplify(uint32_t resolution)
     vertices = vavg;
     normals = vnorm;
 }
-void mesh::compute_normals_vertex()
+void Mesh::compute_normals_vertex()
 {
     return;
 }
-uint32_t mesh::get_vertex_count()
+uint32_t Mesh::get_vertex_count()
 {
     return vertices.size();
 }
-uint32_t mesh::get_triangle_count()
+uint32_t Mesh::get_triangle_count()
 {
     return triangles.size();
 }
