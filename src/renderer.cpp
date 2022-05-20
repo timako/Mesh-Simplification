@@ -23,6 +23,22 @@ Renderer::Renderer(uint32_t shader_id, Mesh &m)
 {
     programID = shader_id;
     model = m;
+    // print bounding box of model and m
+    std::cout << "model" << std::endl;
+    std::cout << "xmin: " << model.box.xmin << std::endl;
+    std::cout << "xmax: " << model.box.xmax << std::endl;
+    std::cout << "ymin: " << model.box.ymin << std::endl;
+    std::cout << "ymax: " << model.box.ymax << std::endl;
+    std::cout << "zmin: " << model.box.zmin << std::endl;
+    std::cout << "zmax: " << model.box.zmax << std::endl;
+    std::cout << "m" << std::endl;
+    std::cout << "xmin: " << m.box.xmin << std::endl;
+    std::cout << "xmax: " << m.box.xmax << std::endl;
+    std::cout << "ymin: " << m.box.ymin << std::endl;
+    std::cout << "ymax: " << m.box.ymax << std::endl;
+    std::cout << "zmin: " << m.box.zmin << std::endl;
+    std::cout << "zmax: " << m.box.zmax << std::endl;
+
     // Create Vertex Array Object
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
@@ -47,7 +63,9 @@ Renderer::Renderer(uint32_t shader_id, Mesh &m)
     glGenBuffers(1, &elementbuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, model.get_element_count() * sizeof(uint32_t), &m.indices[0], GL_STATIC_DRAW);
-
+    // print debug info
+    // std::cout << "vertex count: " << model.get_vertex_count() << std::endl;
+    // std::cout << "element count: " << model.get_element_count() << std::endl;
     glUseProgram(programID);
 }
 extern int SCR_WIDTH;
@@ -70,18 +88,61 @@ void Renderer::render(float camera_angle, float light_angle, bool is_light)
         glm::vec3(0, 1, 0)); // up vector
 
     glm::mat4 ModelMatrix = glm::mat4(1.0f);
+    // translate : move the model to the center of world
+    float decalageX = -(model.box.xmax - ((model.box.xmax + abs(model.box.xmin)) / 2.0f));
+    float decalageY = -(model.box.ymax - ((model.box.ymax + abs(model.box.ymin)) / 2.0f));
+    float decalageZ = -(model.box.zmax - ((model.box.zmax + abs(model.box.zmin)) / 2.0f));
+    // print bounding box info to debug
+    std::cout << "xmin: " << model.box.xmin << std::endl;
+    std::cout << "xmax: " << model.box.xmax << std::endl;
+    std::cout << "ymin: " << model.box.ymin << std::endl;
+    std::cout << "ymax: " << model.box.ymax << std::endl;
+    std::cout << "zmin: " << model.box.zmin << std::endl;
+    std::cout << "zmax: " << model.box.zmax << std::endl;
 
-    ModelMatrix = glm::translate(ModelMatrix, -model.box.get_center());
-    ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.0 / (double)model.box.get_size().x));
-    ModelMatrix = glm::rotate(ModelMatrix, glm::radians(camera_angle), glm::vec3(0.0f, 0.1f, 0.0f));
+    // ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.0 / (model.box.ymax + decalageY)));
+    // ModelMatrix = glm::translate(ModelMatrix, glm::vec3(decalageX + 0.5, decalageY, decalageZ - 0.5));
+    // ModelMatrix = glm::rotate(ModelMatrix, glm::radians(camera_angle), glm::vec3(0.0f, 0.1f, 0.0f));
+    ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.0 / (model.box.ymax + decalageY)));
+    ModelMatrix = glm::translate(ModelMatrix, glm::vec3(decalageX + 0.5, decalageY, decalageZ - 0.5));
+    ModelMatrix = glm::rotate(ModelMatrix, glm::radians(camera_angle), glm::vec3(0, 1, 0));
     // glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
     glm::vec3 lightPos = glm::vec3(3.2 * std::cos(light_angle), 2.2, 3.2 * std::sin(light_angle));
     glm::vec3 viewPos = glm::vec3(2, 1, 3);
     // Send our transformation to the currently bound shader,
 
+    // print debug info
+    std::cout << "camera_angle: " << camera_angle << std::endl;
+    std::cout << "light_angle: " << light_angle << std::endl;
+    std::cout << "lightPos: " << lightPos.x << ", " << lightPos.y << ", " << lightPos.z << std::endl;
+    std::cout << "viewPos: " << viewPos.x << ", " << viewPos.y << ", " << viewPos.z << std::endl;
+
     // uniform mat4 M;
     // uniform mat4 V;
     // uniform mat4 P;
+
+    // print M,V,P matrix to debug
+    std::cout << " Modelmat = " << std::endl;
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+            std::cout << ModelMatrix[i][j] << " ";
+        std::cout << std::endl;
+    }
+    std::cout << " Viewmat = " << std::endl;
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+            std::cout << ViewMatrix[i][j] << " ";
+        std::cout << std::endl;
+    }
+    std::cout << " Projmat = " << std::endl;
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+            std::cout << ProjectionMatrix[i][j] << " ";
+        std::cout << std::endl;
+    }
 
     // glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
     glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
@@ -92,6 +153,19 @@ void Renderer::render(float camera_angle, float light_angle, bool is_light)
     // uniform vec3 viewPos;
     glUniform3fv(LightID, 1, &lightPos[0]);
     glUniform3fv(CameraID, 1, &viewPos[0]);
+
+    glm::vec3 lightColor;
+    if (is_light)
+    {
+        lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+    }
+    else
+    {
+        lightColor = glm::vec3(0.0f, 0.0f, 0.0f);
+    }
+    glm::vec3 objectColor = glm::vec3(1.0f, 0.5f, 0.31f);
+    glUniform3fv(LightColorID, 1, &lightColor[0]);
+    glUniform3fv(ObjColorID, 1, &objectColor[0]);
 
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -115,30 +189,21 @@ void Renderer::render(float camera_angle, float light_angle, bool is_light)
         nullptr   // array buffer offset
     );
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+
     glDrawElements(
+        // print debug info
         GL_TRIANGLES,         // mode
         model.indices.size(), // count
         GL_UNSIGNED_SHORT,    // type
         nullptr               // element array buffer offset
     );
+
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
     // uniform vec3 lightPos;
     // uniform vec3 viewPos;
     // uniform vec3 lightColor;
     // uniform vec3 objectColor;
-    glm::vec3 lightColor;
-    if (is_light)
-    {
-        lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-    }
-    else
-    {
-        lightColor = glm::vec3(0.0f, 0.0f, 0.0f);
-    }
-    glm::vec3 objectColor = glm::vec3(1.0f, 0.5f, 0.31f);
-    glUniform3fv(LightColorID, 1, &lightColor[0]);
-    glUniform3fv(ObjColorID, 1, &objectColor[0]);
 }
 void Renderer::update()
 {

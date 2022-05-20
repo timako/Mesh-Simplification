@@ -117,13 +117,22 @@ int main()
     std::string path = std::string(currentPath) + "models/" + loadedFileName + ".off";
     // load mesh
     Mesh origmodel(path.c_str());
+    // print origmodel's bounding box to debug
+    std::cout << "main : origmodel" << std::endl;
+    std::cout << "xmin: " << origmodel.box.xmin << std::endl;
+    std::cout << "xmax: " << origmodel.box.xmax << std::endl;
+    std::cout << "ymin: " << origmodel.box.ymin << std::endl;
+    std::cout << "ymax: " << origmodel.box.ymax << std::endl;
+    std::cout << "zmin: " << origmodel.box.zmin << std::endl;
+    std::cout << "zmax: " << origmodel.box.zmax << std::endl;
     Mesh processModel = origmodel;
     // compile shader
     Shader shader((std::string(currentPath) + "shader/VertexShader.glsl").c_str(), (std::string(currentPath) + "shader/FragmentShader.glsl").c_str());
 
     // create renderer
     Renderer renderer(shader.ID, processModel);
-    // create ImGui
+    // exit(0);
+    //  create ImGui
     ImGui::CreateContext();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init();
@@ -155,7 +164,7 @@ int main()
         }
         // SwapBuffer
 
-                // init render set
+        // init render set
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
@@ -177,8 +186,28 @@ int main()
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         glfwSwapBuffers(window);
         glfwPollEvents();
-        little_sleep(std::chrono::milliseconds(25));
+        // print debug info
+        // std::cout << "vertices: " << numVertices << std::endl;
+        // std::cout << "faces: " << numFaces << std::endl;
+        // std::cout << "vpixelResolution: " << vpixelResolution << std::endl;
+        // std::cout << "islight: " << islight << std::endl;
+        // std::cout << "iswireframe: " << iswireframe << std::endl;
+        // std::cout << "camRotate: " << camRotate << std::endl;
+        // std::cout << "lightRotate: " << lightRotate << std::endl;
+        // std::cout << "loadedFileName: " << loadedFileName << std::endl;
+        // std::cout << "saveFileName: " << saveFileName << std::endl;
+        // std::cout << "toSimplify: " << toSimplify << std::endl;
+        // std::cout << "----------------------------------------" << std::endl;
+        // passed
+
+        little_sleep(std::chrono::milliseconds(200));
     }
+    renderer.clear();
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+    glfwDestroyWindow(window);
+    return 0;
 }
 void drawGui()
 {
