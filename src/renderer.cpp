@@ -104,8 +104,8 @@ void Renderer::render(float camera_angle, float light_angle, bool is_light)
     // ModelMatrix = glm::translate(ModelMatrix, glm::vec3(decalageX + 0.5, decalageY, decalageZ - 0.5));
     // ModelMatrix = glm::rotate(ModelMatrix, glm::radians(camera_angle), glm::vec3(0.0f, 0.1f, 0.0f));
     ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.0 / (model.box.ymax + decalageY)));
-    ModelMatrix = glm::translate(ModelMatrix, glm::vec3(decalageX + 0.5, decalageY, decalageZ - 0.5));
-    ModelMatrix = glm::rotate(ModelMatrix, glm::radians(camera_angle), glm::vec3(0, 1, 0));
+    ModelMatrix = glm::translate(ModelMatrix, glm::vec3(decalageX, decalageY, decalageZ));
+    ModelMatrix = glm::rotate(ModelMatrix, camera_angle, glm::vec3(0, 1, 0));
     // glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
     glm::vec3 lightPos = glm::vec3(3.2 * std::cos(light_angle), 2.2, 3.2 * std::sin(light_angle));
     glm::vec3 viewPos = glm::vec3(2, 1, 3);
@@ -122,27 +122,27 @@ void Renderer::render(float camera_angle, float light_angle, bool is_light)
     // uniform mat4 P;
 
     // print M,V,P matrix to debug
-    std::cout << " Modelmat = " << std::endl;
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-            std::cout << ModelMatrix[i][j] << " ";
-        std::cout << std::endl;
-    }
-    std::cout << " Viewmat = " << std::endl;
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-            std::cout << ViewMatrix[i][j] << " ";
-        std::cout << std::endl;
-    }
-    std::cout << " Projmat = " << std::endl;
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-            std::cout << ProjectionMatrix[i][j] << " ";
-        std::cout << std::endl;
-    }
+    // std::cout << " Modelmat = " << std::endl;
+    // for (int i = 0; i < 4; i++)
+    // {
+    //     for (int j = 0; j < 4; j++)
+    //         std::cout << ModelMatrix[i][j] << " ";
+    //     std::cout << std::endl;
+    // }
+    // std::cout << " Viewmat = " << std::endl;
+    // for (int i = 0; i < 4; i++)
+    // {
+    //     for (int j = 0; j < 4; j++)
+    //         std::cout << ViewMatrix[i][j] << " ";
+    //     std::cout << std::endl;
+    // }
+    // std::cout << " Projmat = " << std::endl;
+    // for (int i = 0; i < 4; i++)
+    // {
+    //     for (int j = 0; j < 4; j++)
+    //         std::cout << ProjectionMatrix[i][j] << " ";
+    //     std::cout << std::endl;
+    // }
 
     // glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
     glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);

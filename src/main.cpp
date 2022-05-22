@@ -147,7 +147,7 @@ int main()
         if (loadedFileName != saveFileName)
         {
             saveFileName = loadedFileName;
-            path = std::string(currentPath) + "model/" + loadedFileName + ".off";
+            path = std::string(currentPath) + "models/" + loadedFileName + ".off";
             origmodel = Mesh(path.c_str());
             processModel = origmodel;
             vpixelResolution = 100;
@@ -165,7 +165,7 @@ int main()
         // SwapBuffer
 
         // init render set
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
         if (iswireframe)
@@ -200,7 +200,7 @@ int main()
         // std::cout << "----------------------------------------" << std::endl;
         // passed
 
-        little_sleep(std::chrono::milliseconds(200));
+        // little_sleep(std::chrono::milliseconds(25));
     }
     renderer.clear();
     ImGui_ImplOpenGL3_Shutdown();
@@ -263,6 +263,26 @@ void drawGui()
                 if (ImGui::MenuItem("Teddy"))
                 {
                     loadedFileName = "teddy";
+                }
+                if (ImGui::MenuItem("Bunny"))
+                {
+                    loadedFileName = "bunny";
+                }
+                if (ImGui::MenuItem("Buddha"))
+                {
+                    loadedFileName = "Buddha";
+                }
+                if (ImGui::MenuItem("Dinosaur"))
+                {
+                    loadedFileName = "dinosaur";
+                }
+                if (ImGui::MenuItem("Cube"))
+                {
+                    loadedFileName = "cube";
+                }
+                if (ImGui::MenuItem("Dragon"))
+                {
+                    loadedFileName = "dragon";
                 }
                 ImGui::EndMenu();
             }
