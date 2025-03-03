@@ -1,2 +1,2 @@
-# OOP_2022_LAB
+# Mesh-Simplification
 mesh simplification implemented by opengl
